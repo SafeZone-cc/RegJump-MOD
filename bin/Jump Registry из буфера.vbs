@@ -3,7 +3,7 @@ Option Explicit: Dim SeparateRegedit
 ' $$$ RegJump MOD by Alex Dragokas            [  SafeZone.cc  ]
 '
 ' $$$ Прыжок в раздел реестра, имя которого скопировано в буфер
-' $$$ ver. 2.12.
+' $$$ ver. 2.13.
 
 ' >>>>>>>>>   Настройки   <<<<<<<<
 
@@ -26,7 +26,7 @@ Dim sLines, sLine
 Dim CompPrefix, lcode
 Dim oRegEx, oMatches
 Dim RunJob, AppPath
-Dim sWinVer, sLastKey
+Dim sWinVer, sLastKey, Temp
 
 Set oRegEx = CreateObject("VBScript.RegExp")
 oRegEx.IgnoreCase = True
@@ -55,6 +55,7 @@ if sWinVer = "Vista" then call Elevate()
 
 'AppPath = oFSO.GetParentFolderName(WScript.ScriptFullName)
 AppPath = left(WScript.ScriptFullname, instrrev(WScript.ScriptFullname, "\") - 1)
+Temp = oShell.ExpandEnvironmentStrings("%Temp%")
 
 rData = GetFromClipBoard()
 if typename(rData) = "Null" then msgbox "Неверный тип данных в буфере!",,AppName: WScript.Quit
@@ -66,9 +67,9 @@ if Len(rData) = 0 then
 		msgbox "Программа GetClip не найдена!" & vbcrlf & "Буфер обмена пуст!"
 		WScript.Quit
 	end if
-	oShell.Run "cmd.exe /c """"" & AppPath & "\GetClip.exe"" /text > """ & AppPath & "\Clip.txt" & """""", 6, true
-	if oFSO.FileExists(AppPath & "\Clip.txt") then
-	    set oTS = oFSO.OpenTextFile(AppPath & "\Clip.txt", 1, false)
+	oShell.Run "cmd.exe /c """"" & AppPath & "\GetClip.exe"" /text > """ & Temp & "\Clip.txt" & """""", 6, true
+	if oFSO.FileExists(Temp & "\Clip.txt") then
+	    set oTS = oFSO.OpenTextFile(Temp & "\Clip.txt", 1, false)
 		rData = oTS.ReadAll
 		oTS.Close
 	end if
@@ -201,7 +202,7 @@ oShell.Run "regedit.exe", 1, false
 
 ' зачистка
 set oFSO       = CreateObject("Scripting.FileSystemObject")
-if oFSO.FileExists(AppPath & "\Clip.txt") then oFSO.DeleteFile AppPath & "\Clip.txt", true
+if oFSO.FileExists(Temp & "\Clip.txt") then oFSO.DeleteFile Temp & "\Clip.txt", true
 WScript.Quit
 
 Function ExpandHiveName(byval sData)

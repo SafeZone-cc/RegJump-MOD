@@ -7,7 +7,7 @@ Set oShell     = CreateObject("WScript.Shell")
 Set oFSO       = CreateObject("Scripting.FileSystemObject")
 Set oShellApp  = CreateObject("Shell.Application")
 
-AppName   = "RegJump MOD by Dragokas ver 2.11"
+AppName   = "RegJump MOD by Dragokas ver 2.14"
 
 SendTo      = oShell.SpecialFolders("SendTo")
 AppData     = oShell.SpecialFolders("AppData")

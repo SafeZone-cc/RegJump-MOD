@@ -3,7 +3,7 @@ Option Explicit: Dim SeparateRegedit
 ' $$$ RegJump MOD by Alex Dragokas            [  SafeZone.cc  ]
 '
 ' $$$ Прыжок в раздел реестра, имя которого скопировано в буфер
-' $$$ ver. 2.13.
+' $$$ ver. 2.14.
 
 ' >>>>>>>>>   Настройки   <<<<<<<<
 
@@ -69,9 +69,12 @@ if Len(rData) = 0 then
 	end if
 	oShell.Run "cmd.exe /c """"" & AppPath & "\GetClip.exe"" /text > """ & Temp & "\Clip.txt" & """""", 6, true
 	if oFSO.FileExists(Temp & "\Clip.txt") then
+		'на случай одновременного запуска нескольких копий, если Clip.txt был стёрт в этот момент предыдущим экземпляром скрипта
+		On Error Resume Next
 	    set oTS = oFSO.OpenTextFile(Temp & "\Clip.txt", 1, false)
 		rData = oTS.ReadAll
 		oTS.Close
+		On Error Goto 0
 	end if
 	if Len(rData) = 0 then
 		msgbox "Буфер обмена пуст!"
@@ -202,6 +205,8 @@ oShell.Run "regedit.exe", 1, false
 
 ' зачистка
 set oFSO       = CreateObject("Scripting.FileSystemObject")
+' если скрипт попытаются запутить несколько раз одновременно Clip.txt может оказаться в ситуации одновременного доступа на запись и удаление.
+On Error Resume Next
 if oFSO.FileExists(Temp & "\Clip.txt") then oFSO.DeleteFile Temp & "\Clip.txt", true
 WScript.Quit
 
